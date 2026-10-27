@@ -1,0 +1,108 @@
+---
+import { buildGlyph } from '~/lib/glyph';
+
+interface Props {
+  seed: string;
+  class?: string;
+}
+
+const { seed, class: className } = Astro.props;
+const glyph = buildGlyph(seed);
+const curve = (x1: number, y1: number, x2: number, y2: number) => {
+  const mid = (x1 + x2) / 2;
+  return `M${x1} ${y1} C${mid} ${y1}, ${mid} ${y2}, ${x2} ${y2}`;
+};
+---
+
+<svg
+  class:list={['glyph', className]}
+  viewBox={`0 0 ${glyph.width} ${glyph.height}`}
+  preserveAspectRatio="xMidYMid meet"
+  aria-hidden="true"
+  focusable="false"
+>
+  <g class="glyph__edges">
+    {glyph.edges
+      .filter((e) => !e.lit)
+      .map((e) => (
+        <path d={curve(e.from.x, e.from.y, e.to.x, e.to.y)} />
+      ))}
+  </g>
+  <g class="glyph__path">
+    {glyph.edges
+      .filter((e) => e.lit)
+      .map((e) => (
+        <path d={curve(e.from.x, e.from.y, e.to.x, e.to.y)} pathLength="1" />
+      ))}
+  </g>
+  <g class="glyph__nodes">
+    {glyph.nodes.map((n) =>
+      n.lit ? (
+        <g class="glyph__lit">
+          <circle cx={n.x} cy={n.y} r="9" class="glyph__halo" />
+          <circle cx={n.x} cy={n.y} r="4.5" />
+        </g>
+      ) : (
+        <circle cx={n.x} cy={n.y} r="3.5" />
+      ),
+    )}
+  </g>
+</svg>
+
+<style>
+  .glyph {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .glyph__edges path {
+    fill: none;
+    stroke: var(--line-strong);
+    stroke-width: 1;
+  }
+
+  .glyph__path path {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1.75;
+    stroke-linecap: round;
+  }
+
+  .glyph__nodes circle {
+    fill: var(--bg-raised);
+    stroke: var(--muted);
+    stroke-width: 1.25;
+  }
+
+  .glyph__lit circle {
+    fill: var(--accent);
+    stroke: none;
+  }
+
+  .glyph__lit .glyph__halo {
+    fill: var(--accent);
+    opacity: 0.16;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .glyph__path path {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 0;
+      transition: stroke-dashoffset 900ms var(--ease-out);
+    }
+
+    :global(.glyph-host:hover) .glyph__path path {
+      animation: glyph-trace 1100ms var(--ease-out);
+    }
+  }
+
+  @keyframes glyph-trace {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+</style>
