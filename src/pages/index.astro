@@ -231,6 +231,10 @@ const linkFor = (slug: string) => {
     padding-block: clamp(2.5rem, 6vw, 6rem) var(--space-2xl);
   }
 
+  .hero > * {
+    min-width: 0;
+  }
+
   @media (min-width: 56rem) {
     .hero {
       grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
@@ -335,10 +339,14 @@ const linkFor = (slug: string) => {
   @media (min-width: 56rem) {
     .hero__terminal {
       position: absolute;
-      left: -28%;
-      right: 18%;
-      bottom: -2.5rem;
+      left: -14%;
+      right: 6%;
+      bottom: -11rem;
       margin: 0;
+    }
+
+    .hero__visual {
+      margin-bottom: 9rem;
     }
   }
 

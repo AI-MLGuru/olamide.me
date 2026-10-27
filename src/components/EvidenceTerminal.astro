@@ -6,7 +6,7 @@
 const runs = [
   {
     project: 'KODA API · 8 suites · isolated Postgres 16',
-    command: 'pytest tests/test_menus.py tests/test_public_qr_gating.py … -q',
+    command: 'pytest tests/test_menus.py … tests/test_tenant_isolation.py -q',
     result: '146 passed',
   },
   {
@@ -95,9 +95,11 @@ const runs = [
   .terminal__run {
     display: grid;
     gap: 0.1rem;
+    min-width: 0;
   }
 
   .terminal code {
+    display: block;
     font-family: var(--font-mono);
     white-space: nowrap;
     overflow: hidden;
