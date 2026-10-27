@@ -1,0 +1,53 @@
+---
+import Icon from '~/components/Icon.astro';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import { withBase } from '~/lib/paths';
+---
+
+<BaseLayout title="Not found" description="This page doesn’t exist." noindex>
+  <section class="container missing">
+    <p class="eyebrow mono">404 · no evidence found</p>
+    <h1>
+      This page{' '}
+      <span class="serif">
+        <em>isn’t claimed.</em>
+      </span>
+    </h1>
+    <p class="prose">
+      The link may be outdated, or the page may have moved. Everything that exists is linked from
+      the work directory.
+    </p>
+    <div class="actions">
+      <a class="button button--primary" href={withBase('/projects/')}>
+        Browse the work <Icon name="arrow-right" />
+      </a>
+      <a class="button" href={withBase('/')}>
+        Home
+      </a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .missing {
+    padding-block: var(--space-2xl);
+    min-height: 60vh;
+  }
+
+  h1 {
+    margin-block: var(--space-s) var(--space-m);
+    font-size: var(--step-4);
+    letter-spacing: -0.04em;
+  }
+
+  h1 .serif {
+    color: var(--accent);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-s);
+    margin-top: var(--space-l);
+  }
+</style>
