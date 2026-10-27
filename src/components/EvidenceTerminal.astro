@@ -1,0 +1,161 @@
+---
+/**
+ * Replays focused test runs recorded in PROJECT_AUDIT.md. Commands are shortened for
+ * display, but the suites and the results are exactly as recorded.
+ */
+const runs = [
+  {
+    project: 'KODA API · 8 suites · isolated Postgres 16',
+    command: 'pytest tests/test_menus.py tests/test_public_qr_gating.py … -q',
+    result: '146 passed',
+  },
+  {
+    project: 'Ajo · assistant evaluation + demo cycle',
+    command: 'pytest tests/test_assistant_evaluation.py tests/test_demo_cycle.py -q',
+    result: '18 passed',
+  },
+  {
+    project: 'IHcPro · ML monitoring helpers',
+    command: 'pytest backend/tests/unit/test_ml.py -q',
+    result: '5 passed',
+  },
+  {
+    project: 'BUILD · hybrid retrieval',
+    command: 'pytest tests/unit/test_rag_vector_store.py -q',
+    result: '3 passed',
+  },
+];
+---
+
+<figure class="terminal" aria-labelledby="terminal-caption">
+  <div class="terminal__bar" aria-hidden="true">
+    <span></span>
+    <span></span>
+    <span></span>
+    <code>recorded-runs.log</code>
+  </div>
+  <ol class="terminal__body" role="list">
+    {runs.map((run, i) => (
+      <li class="terminal__run" style={`--i: ${i}`}>
+        <code class="terminal__comment"># {run.project}</code>
+        <code class="terminal__cmd">
+          <span aria-hidden="true">$ </span>
+          {run.command}
+        </code>
+        <code class="terminal__result">{run.result}</code>
+      </li>
+    ))}
+  </ol>
+  <figcaption id="terminal-caption" class="visually-hidden">
+    Focused test runs recorded for four projects.
+  </figcaption>
+</figure>
+
+<style>
+  .terminal {
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-m);
+    background: #11120f;
+    color: #e6e3da;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    font-size: 0.74rem;
+  }
+
+  .terminal__bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.6rem 0.85rem;
+    border-bottom: 1px solid #262823;
+  }
+
+  .terminal__bar span {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #3a3d36;
+  }
+
+  .terminal__bar code {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: #8a877f;
+  }
+
+  .terminal__body {
+    display: grid;
+    gap: 0.8rem;
+    padding: 0.9rem 1rem 1.1rem;
+    margin: 0;
+    list-style: none;
+  }
+
+  .terminal__run {
+    display: grid;
+    gap: 0.1rem;
+  }
+
+  .terminal code {
+    font-family: var(--font-mono);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .terminal__comment {
+    color: #8a877f;
+  }
+
+  .terminal__cmd span {
+    color: #ff7a45;
+  }
+
+  .terminal__result {
+    color: #86d297;
+    font-weight: 600;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .terminal__run {
+      opacity: 0;
+      animation: run-in 500ms var(--ease-out) forwards;
+      animation-delay: calc(500ms + var(--i) * 650ms);
+    }
+
+    .terminal__result {
+      opacity: 0;
+      animation: run-in 300ms var(--ease-out) forwards;
+      animation-delay: calc(850ms + var(--i) * 650ms);
+    }
+
+    .terminal__run:last-child .terminal__result::after {
+      content: '';
+      display: inline-block;
+      width: 0.55em;
+      height: 1em;
+      margin-left: 0.4em;
+      vertical-align: -0.15em;
+      background: #e6e3da;
+      animation: blink 1s steps(1) infinite;
+    }
+  }
+
+  @keyframes run-in {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+</style>
