@@ -1,9 +1,583 @@
 ---
+import { Picture } from 'astro:assets';
+import portrait from '~/assets/portrait.jpg';
+import EvidenceTerminal from '~/components/EvidenceTerminal.astro';
+import Icon from '~/components/Icon.astro';
+import ProjectCard from '~/components/ProjectCard.astro';
+import { profile } from '~/data/profile';
+import { featuredProjects, getProject, projects } from '~/data/projects';
 import BaseLayout from '~/layouts/BaseLayout.astro';
+import { projectPath, withBase } from '~/lib/paths';
+
+const proof = [
+  { value: '146', label: 'KODA API tests passing on isolated Postgres', slug: 'koda' },
+  { value: '18', label: 'Ajo assistant-evaluation and demo tests', slug: 'ajo-savings-circle' },
+  { value: '5', label: 'IHcPro ML monitoring unit tests', slug: 'ihcpro-data-analytics' },
+  { value: String(projects.length), label: 'projects, each with its limits stated', slug: null },
+];
+
+const capabilities = [
+  {
+    title: 'Applied ML',
+    body: 'Training pipelines with leakage-safe temporal splits, drift monitoring, per-prediction explanations, and embedding-based ranking.',
+    slugs: ['ihcpro-data-analytics', 'spirt', 'easybirth', 'hustle'],
+  },
+  {
+    title: 'Agentic systems',
+    body: 'Agent loops that validate plans, cap their own steps, wait for approval, and stop when context is missing.',
+    slugs: ['koraspace', 'build'],
+  },
+  {
+    title: 'Grounded assistants',
+    body: 'Assistants that answer from verified records rather than generating figures, backed by deterministic evaluation suites.',
+    slugs: ['ajo-savings-circle'],
+  },
+  {
+    title: 'Backend platforms',
+    body: 'Multi-tenant APIs with isolation enforced in the database, access policies with tested boundaries, and hybrid retrieval services.',
+    slugs: ['koda', 'build', 'paxli', 'alphakolect'],
+  },
+];
+
+const principles = [
+  {
+    title: 'Ground the model',
+    body: 'If an answer involves money, health, or identity, it comes from records, not from the model’s imagination.',
+    slug: 'ajo-savings-circle',
+  },
+  {
+    title: 'Isolate by default',
+    body: 'Tenant boundaries belong in the data layer, with tests that try to cross them.',
+    slug: 'koda',
+  },
+  {
+    title: 'Fail closed',
+    body: 'When an agent can’t establish its context, the safe move is to stop and say so.',
+    slug: 'koraspace',
+  },
+  {
+    title: 'Say what isn’t built',
+    body: 'Every project here has a “Not claimed” list. Honest scope builds more trust than inflated scope.',
+    slug: 'build',
+  },
+];
+
+const linkFor = (slug: string) => {
+  const project = getProject(slug);
+  if (!project) throw new Error(`Unknown project slug "${slug}" on the home page`);
+  return { href: projectPath(slug), title: project.title };
+};
 ---
 
-<BaseLayout description="AI/ML and backend engineering portfolio.">
-  <section class="section container">
-    <h1>Olamide Fadahunsi</h1>
+<BaseLayout
+  description={`${profile.name} is an ${profile.title} building ML pipelines, agentic systems, grounded assistants, and multi-tenant backends. Every project lists its evidence and its limits.`}
+  type="profile"
+>
+  <section class="hero container">
+    <div class="hero__copy">
+      <p class="eyebrow hero__eyebrow">
+        <span class="pulse" aria-hidden="true"></span>
+        {profile.title} · {profile.location}
+      </p>
+      <h1 class="hero__title">
+        I build AI systems that can{' '}
+        <span class="serif">
+          <em>show their work.</em>
+        </span>
+      </h1>
+      <p class="hero__lede">
+        I’m {profile.name.split(' ')[0]}. I work across data, algorithms, backend systems, and
+        agentic software: the layers where a confident wrong answer costs the most. This site works
+        the same way. Every project shows what was built, how it was checked, and what it doesn’t do
+        yet.
+      </p>
+      <div class="hero__actions">
+        <a class="button button--primary" href={withBase('/projects/')}>
+          See the work <Icon name="arrow-right" />
+        </a>
+        <a class="button" href={withBase('/contact/')}>
+          Get in touch
+        </a>
+      </div>
+    </div>
+
+    <div class="hero__visual">
+      <div class="portrait">
+        <Picture
+          src={portrait}
+          alt={`Portrait of ${profile.name}`}
+          widths={[360, 540, 720]}
+          sizes="(min-width: 56rem) 26rem, 80vw"
+          formats={['avif', 'webp']}
+          loading="eager"
+          fetchpriority="high"
+        />
+      </div>
+      <div class="hero__terminal">
+        <EvidenceTerminal />
+      </div>
+    </div>
+  </section>
+
+  <section class="proof" aria-label="Recorded results">
+    <ul class="container proof__list" role="list">
+      {proof.map((item, i) => (
+        <li data-reveal style={`--reveal-delay: ${i * 80}ms`}>
+          <a href={item.slug ? projectPath(item.slug) : withBase('/projects/')}>
+            <span class="proof__value mono">{item.value}</span>
+            <span class="proof__label">{item.label}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="section container" aria-labelledby="selected-heading">
+    <header class="section-head">
+      <p class="eyebrow">01 · Selected work</p>
+      <h2 id="selected-heading">The best-evidenced projects</h2>
+      <a class="section-head__link" href={withBase('/projects/')}>
+        All {projects.length} projects <Icon name="arrow-right" />
+      </a>
+    </header>
+    <ul class="featured" role="list">
+      {featuredProjects.map((project, i) => (
+        <li>
+          <ProjectCard project={project} size="large" index={i} />
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="section container" aria-labelledby="capabilities-heading">
+    <header class="section-head">
+      <p class="eyebrow">02 · Capabilities</p>
+      <h2 id="capabilities-heading">What I bring to a team</h2>
+    </header>
+    <ul class="capabilities" role="list">
+      {capabilities.map((cap, i) => (
+        <li class="capability" data-reveal style={`--reveal-delay: ${i * 70}ms`}>
+          <h3>{cap.title}</h3>
+          <p>{cap.body}</p>
+          <p class="capability__seen">
+            <span class="eyebrow">Seen in</span>
+            {cap.slugs.map((slug) => {
+              const link = linkFor(slug);
+              return <a href={link.href}>{link.title}</a>;
+            })}
+          </p>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="section container principles" aria-labelledby="principles-heading">
+    <header class="section-head">
+      <p class="eyebrow">03 · How I work</p>
+      <h2 id="principles-heading">Four rules I build by</h2>
+    </header>
+    <ol class="principles__list" role="list">
+      {principles.map((p, i) => {
+        const link = linkFor(p.slug);
+        return (
+          <li class="principle" data-reveal style={`--reveal-delay: ${i * 70}ms`}>
+            <span class="principle__index mono" aria-hidden="true">
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            <div>
+              <h3 class="serif">{p.title}</h3>
+              <p>{p.body}</p>
+              <a class="principle__link" href={link.href}>
+                In practice: {link.title} <Icon name="arrow-right" />
+              </a>
+            </div>
+          </li>
+        );
+      })}
+    </ol>
+  </section>
+
+  <section class="section container cta" aria-labelledby="cta-heading">
+    <div class="cta__card" data-reveal>
+      <h2 id="cta-heading">
+        Hiring for AI, ML, or backend work?{' '}
+        <span class="serif">
+          <em>Let’s talk.</em>
+        </span>
+      </h2>
+      <p>
+        I’m happy to walk through any project here in depth, including the parts that aren’t
+        finished.
+      </p>
+      <div class="hero__actions">
+        <a class="button button--primary" href={`mailto:${profile.email}`}>
+          <Icon name="mail" /> Email me
+        </a>
+        <a class="button" href={withBase('/about/')}>
+          More about me
+        </a>
+      </div>
+    </div>
   </section>
 </BaseLayout>
+
+<style>
+  /* ---------- Hero ---------- */
+
+  .hero {
+    display: grid;
+    gap: var(--space-xl);
+    align-items: center;
+    padding-block: clamp(2.5rem, 6vw, 6rem) var(--space-2xl);
+  }
+
+  @media (min-width: 56rem) {
+    .hero {
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+      gap: var(--space-2xl);
+    }
+  }
+
+  .hero__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6em;
+  }
+
+  .pulse {
+    position: relative;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--ok);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .pulse::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: var(--ok);
+      animation: pulse 2.4s var(--ease-out) infinite;
+    }
+  }
+
+  @keyframes pulse {
+    to {
+      transform: scale(3);
+      opacity: 0;
+    }
+  }
+
+  .hero__title {
+    margin-block: var(--space-m);
+    font-size: var(--step-4);
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+
+  .hero__title .serif {
+    color: var(--accent);
+    letter-spacing: -0.02em;
+  }
+
+  .hero__lede {
+    max-width: 54ch;
+    font-size: var(--step-1);
+    line-height: 1.55;
+    color: var(--ink-soft);
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-s);
+    margin-top: var(--space-l);
+  }
+
+  .hero__visual {
+    position: relative;
+    max-width: 28rem;
+    width: 100%;
+    justify-self: center;
+  }
+
+  .portrait {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    border-radius: var(--radius-l);
+    overflow: hidden;
+    border: 1px solid var(--line);
+    background: var(--bg-sunken);
+  }
+
+  .portrait::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgb(0 0 0 / 0.28), transparent 45%);
+    pointer-events: none;
+  }
+
+  .portrait :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 30%;
+  }
+
+  .hero__terminal {
+    position: relative;
+    margin: -5rem 0.75rem 0;
+  }
+
+  @media (min-width: 56rem) {
+    .hero__terminal {
+      position: absolute;
+      left: -28%;
+      right: 18%;
+      bottom: -2.5rem;
+      margin: 0;
+    }
+  }
+
+  /* ---------- Proof strip ---------- */
+
+  .proof {
+    border-block: 1px solid var(--line);
+    background: var(--bg-raised);
+  }
+
+  .proof__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+    padding: 0;
+    list-style: none;
+  }
+
+  .proof__list li + li {
+    border-left: 1px solid var(--line);
+  }
+
+  @media (max-width: 30rem) {
+    .proof__list li + li {
+      border-left: 0;
+      border-top: 1px solid var(--line);
+    }
+  }
+
+  .proof__list a {
+    display: grid;
+    gap: var(--space-2xs);
+    padding: var(--space-l) var(--space-m);
+    text-decoration: none;
+    height: 100%;
+  }
+
+  .proof__list a:hover .proof__value {
+    color: var(--accent);
+  }
+
+  .proof__value {
+    font-size: var(--step-3);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    transition: color 200ms var(--ease-out);
+  }
+
+  .proof__label {
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+
+  /* ---------- Sections ---------- */
+
+  .section-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: var(--space-xs) var(--space-l);
+    margin-bottom: var(--space-xl);
+  }
+
+  .section-head .eyebrow {
+    flex-basis: 100%;
+  }
+
+  .section-head h2 {
+    font-size: var(--step-3);
+    letter-spacing: -0.03em;
+  }
+
+  .section-head__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    margin-left: auto;
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .section-head__link :global(svg) {
+    width: 1rem;
+    height: 1rem;
+    transition: transform 200ms var(--ease-out);
+  }
+
+  .section-head__link:hover :global(svg) {
+    transform: translateX(3px);
+  }
+
+  .featured {
+    display: grid;
+    gap: var(--space-m);
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 48rem) {
+    .featured {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .featured > li {
+    display: flex;
+  }
+
+  .featured > li > :global(*) {
+    flex: 1;
+  }
+
+  /* ---------- Capabilities ---------- */
+
+  .capabilities {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    border-top: 1px solid var(--line);
+    padding: 0;
+    list-style: none;
+  }
+
+  .capability {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-s);
+    padding: var(--space-l) var(--space-m) var(--space-l) 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  @media (min-width: 40rem) {
+    .capability {
+      padding-left: var(--space-m);
+      border-left: 1px solid var(--line);
+    }
+  }
+
+  .capability h3 {
+    font-size: var(--step-1);
+  }
+
+  .capability p {
+    color: var(--ink-soft);
+    font-size: 0.97rem;
+  }
+
+  .capability__seen {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.35rem 0.75rem;
+    margin-top: auto;
+    padding-top: var(--space-s);
+  }
+
+  .capability__seen a {
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  /* ---------- Principles ---------- */
+
+  .principles__list {
+    display: grid;
+    gap: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 48rem) {
+    .principles__list {
+      grid-template-columns: 1fr 1fr;
+      column-gap: var(--space-2xl);
+    }
+  }
+
+  .principle {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--space-m);
+    padding-block: var(--space-l);
+    border-top: 1px solid var(--line);
+  }
+
+  .principle__index {
+    font-size: 0.85rem;
+    color: var(--accent);
+    padding-top: 0.6rem;
+  }
+
+  .principle h3 {
+    font-size: var(--step-3);
+    letter-spacing: -0.01em;
+    line-height: 1.05;
+  }
+
+  .principle p {
+    margin-top: var(--space-xs);
+    color: var(--ink-soft);
+  }
+
+  .principle__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    margin-top: var(--space-s);
+    font-size: 0.9rem;
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  .principle__link :global(svg) {
+    width: 0.9rem;
+    height: 0.9rem;
+  }
+
+  /* ---------- CTA ---------- */
+
+  .cta__card {
+    padding: clamp(1.75rem, 5vw, 4rem);
+    border-radius: var(--radius-l);
+    background:
+      radial-gradient(120% 140% at 100% 0%, var(--accent-soft), transparent 55%), var(--bg-raised);
+    border: 1px solid var(--line);
+  }
+
+  .cta__card h2 {
+    max-width: 20ch;
+    font-size: var(--step-3);
+    letter-spacing: -0.03em;
+  }
+
+  .cta__card .serif {
+    color: var(--accent);
+  }
+
+  .cta__card p {
+    max-width: 52ch;
+    margin-top: var(--space-m);
+    color: var(--ink-soft);
+  }
+</style>
