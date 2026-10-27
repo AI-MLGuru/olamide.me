@@ -1,0 +1,6 @@
+dist/
+.astro/
+node_modules/
+package-lock.json
+PROJECT_AUDIT.md
+IMPLEMENTATION_PLAN.md
