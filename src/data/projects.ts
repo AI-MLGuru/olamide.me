@@ -48,10 +48,7 @@ export const projects: readonly Project[] = [
       'Menu infrastructure only. There is no ordering or delivery.',
     ],
     stack: ['Python', 'TypeScript', 'React', 'PostgreSQL'],
-    links: [
-      { kind: 'site', href: 'https://koda.paxalphaltd.com' },
-      { kind: 'repo', href: 'https://github.com/AI-MLGuru/restaurant-menu-saas' },
-    ],
+    links: [{ kind: 'site', href: 'https://koda.paxalphaltd.com' }],
     featured: 1,
   },
   {
@@ -248,7 +245,7 @@ export const projects: readonly Project[] = [
     ],
     boundaries: ['No match-quality metrics are claimed.'],
     stack: ['Python', 'TypeScript', 'Embeddings'],
-    links: [{ kind: 'team-repo', href: 'https://github.com/BAIUK1/ai-sports' }],
+    links: [],
   },
   {
     slug: 'easybirth',
@@ -305,7 +302,7 @@ export const projects: readonly Project[] = [
       'No complaint data is shown here.',
     ],
     stack: ['Python', 'JavaScript', 'Docker'],
-    links: [{ kind: 'repo', href: 'https://github.com/AI-MLGuru/fraud-reporting-platform' }],
+    links: [],
   },
   {
     slug: 'hustle',
@@ -413,7 +410,7 @@ export const projects: readonly Project[] = [
     ],
     boundaries: ['The company name may change.', 'No product launch or customer claims.'],
     stack: ['Next.js', 'React', 'TypeScript'],
-    links: [{ kind: 'repo', href: 'https://github.com/AI-MLGuru/Uchedav-industries-website' }],
+    links: [],
   },
 ];
 
