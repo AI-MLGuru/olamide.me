@@ -1,8 +1,8 @@
 # portfolio.me
 
-Source for [ai-mlguru.github.io/portfolio.me](https://ai-mlguru.github.io/portfolio.me/), the portfolio of Olamide Fadahunsi (AI/ML & backend engineer).
+Source for the portfolio of Olamide Fadahunsi (AI/ML & backend engineer).
 
-Static site built with Astro and TypeScript, deployed to GitHub Pages by `.github/workflows/deploy.yml`.
+Static site built with Astro and TypeScript, deployed to GitHub Pages by `.github/workflows/deploy.yml`. GitHub Actions derives the project base path from the repository name, so production assets and internal links match the deployed repository URL.
 
 ## Develop
 
@@ -15,7 +15,7 @@ npm run preview    # serve the production build
 npm run og         # regenerate public/og.png
 ```
 
-Node 22.12 or newer.
+Node 22.23.4 or newer.
 
 ## Where things live
 
@@ -25,7 +25,7 @@ Node 22.12 or newer.
 | `src/data/schema.ts`, `validate.ts` | Catalog types and build-time validation. A bad record fails the build.                  |
 | `src/data/profile.ts`               | Name, title, and contact methods. Set `linkedin`, `x`, or `resume` to show them.        |
 | `src/styles/global.css`             | Design tokens (light and dark) and base styles.                                         |
-| `src/lib/paths.ts`                  | `withBase()`. Use it for every internal link so routes work under `/portfolio.me/`.     |
+| `src/lib/paths.ts`                  | `withBase()`. Use it for every internal link so routes include Astro's configured base. |
 
 ## Content rules
 

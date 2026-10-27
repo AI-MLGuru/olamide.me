@@ -1,6 +1,6 @@
 /**
- * The site is served from /portfolio.me/ on GitHub Pages, so internal links must carry
- * the base path. `withBase('/projects/')` → `/portfolio.me/projects/`.
+ * Internal links carry Astro's configured GitHub Pages base path.
+ * For example, `withBase('/projects/')` → `<base>/projects/`.
  */
 const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
 

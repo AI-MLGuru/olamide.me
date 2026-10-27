@@ -11,7 +11,7 @@ This is a plan, not a claim that the projects or their published results have al
 - The repository contains a single `index.html`, `profile.jpg`, and IDE metadata; it has no `package.json`, TypeScript setup, component system, test suite, or build pipeline.
 - The current page already supplies a simple content outline (intro, about, projects, skills, contact) and a profile image that may be reusable after approval.
 - The page includes personal details and a bio that may no longer be current. Reconfirm all public-facing copy and contact details; do not carry over the age statement or phone number without explicit approval.
-- The repository's GitHub Pages homepage is currently `https://ai-mlguru.github.io/portfolio.me/`. Preserve this URL unless a replacement domain is chosen; account for the `/portfolio.me/` base path in static asset and route configuration.
+- GitHub Pages serves the deployed project under its repository-name path. Derive Astro's production `base` from `GITHUB_REPOSITORY` so asset and route URLs match the actual deployed repository; keep `/portfolio.me/` as the local fallback.
 - There is no application architecture or framework to preserve. Keep the existing Git history and selectively reuse approved content and assets.
 
 ## Audience and positioning
@@ -88,7 +88,7 @@ The GitHub profile is an additional cross-check, not a substitute for the suppli
 - **Astro with TypeScript**, rendered as a static site. This is a good fit for a content-led portfolio with index and case-study pages, strong page-level metadata, and no required backend.
 - Use Astro components, TypeScript, CSS custom properties, and minimal client-side JavaScript. Use the typed local project catalog as the single source of project data and shared components/layouts for consistent presentation.
 - Do not add a database, CMS, server API, animation framework, or live GitHub API dependency in the first release. Add dependencies only to meet a concrete requirement.
-- Configure the static build for the existing GitHub Pages project path (`/portfolio.me/`) from the start. Make internal links, images, canonical URLs, sitemap entries, and deployment artifacts base-path aware.
+- Configure the static build for the GitHub Pages repository path from the start. Make internal links, images, canonical URLs, sitemap entries, and deployment artifacts base-path aware.
 - Reassess framework choice before implementation only if the repository audit reveals a requirement that static Astro cannot meet.
 
 ## Delivery phases
@@ -112,12 +112,12 @@ The GitHub profile is an additional cross-check, not a substitute for the suppli
 ### Phase 2 — Establish the foundation and deployment path
 
 - Add Astro, TypeScript, package scripts, formatting/linting conventions, and a static production build.
-- Configure the site URL, `/portfolio.me/` base path, internal link and asset strategy, canonical URL generation, and sitemap behavior before building out pages.
+- Configure the site URL, repository-specific base path, internal link and asset strategy, canonical URL generation, and sitemap behavior before building out pages.
 - Define the typed project schema, create the initial records for all 13 first-release projects, and make catalog validation part of the build.
 - Establish the initial design tokens and shared page shell; defer page-by-page visual polish until deployment and content generation are proven.
-- Deploy a minimal production build to GitHub Pages and verify that routes, links, images, canonical URLs, and sitemap work under `/portfolio.me/`.
+- Deploy a minimal production build to GitHub Pages and verify that routes, links, images, canonical URLs, and sitemap work under the deployed repository path.
 
-**Exit criteria:** clean install and production build; all 13 first-release catalog records validate; a minimal page deploys and resolves links/assets correctly under `/portfolio.me/`.
+**Exit criteria:** clean install and production build; all 13 first-release catalog records validate; a minimal page deploys and resolves links/assets correctly under the repository-derived GitHub Pages path.
 
 ### Phase 3 — Build the core pages and responsive design
 
