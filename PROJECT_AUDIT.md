@@ -69,6 +69,8 @@ This pass adds a bounded evidence check for the first-release projects and the c
 
 These are GitHub API metadata links and should be displayed only after the contribution/attribution and access decisions above are confirmed: [SPIRT](https://github.com/BAIUK1/ai-sports), [PaxLI](https://github.com/AI-MLGuru/PaxLI), [Fraud Reporting Platform](https://github.com/AI-MLGuru/fraud-reporting-platform), [KODA](https://github.com/AI-MLGuru/restaurant-menu-saas), [Uchedav Industries](https://github.com/AI-MLGuru/Uchedav-industries-website), [Easybirth](https://github.com/MI-TECHDLIN/easybirth), [Ajo demo](https://github.com/olowolayemogoodness-crypto/ajo-hackathon-bmoni), and [Hustle](https://github.com/olowolayemogoodness-crypto/hustle). BUILD was described as private in its local backend README. GitHub metadata lists a Build-waitlist repo under the Build-by-The-Forge organization, but its homepage URL currently resolves to unrelated content. Absence from this list does not mean a project has no public repository; confirm the correct destination before adding it.
 
+**Visibility check (2026-10-27, GitHub API):** `AI-MLGuru/PaxLI`, `MI-TECHDLIN/easybirth`, `olowolayemogoodness-crypto/ajo-hackathon-bmoni`, and `olowolayemogoodness-crypto/hustle` are public and are linked on the site (collaborator-hosted ones labelled as team repositories). `AI-MLGuru/restaurant-menu-saas`, `AI-MLGuru/fraud-reporting-platform`, `AI-MLGuru/Uchedav-industries-website`, and `BAIUK1/ai-sports` are **private** and are not linked. `https://koda.paxalphaltd.com` returned HTTP 200 and remains KODA's only public link.
+
 ## Project records
 
 | # | Catalog entry | Identity and purpose supported by current evidence | Source / technology evidence | Tests and verification evidence | Remaining checks before publication |
@@ -116,7 +118,7 @@ This checklist applies only to the 13-project first-release catalog. The 17-entr
 | Relevant test/evaluation outcomes | **blocked** | Focused results exist for Ajo, BUILD, IHcPro, and KODA. KODA's menu creation/publication, QR access, tenant isolation, and expiry-gating suites passed against an isolated PostgreSQL database; most other entries still need a scoped check or an explicit rationale for not running one. |
 | Safe assets, public links, and profile content | **blocked** | Permission is recorded, but actual screenshots/data safety, project URLs, and bio/contact/resume details are not reconciled. |
 | Case-study selection and narrative | **blocked** | Ajo is the strongest first draft candidate; the detailed narrative is not yet reconciled and approved. |
-| Astro implementation | **deferred** | Remains gated until project-level acceptance blockers and profile/content gates are closed. |
+| Astro implementation | **implemented (pending deploy)** | Cleared by the owner's Phase 1 decision. The Astro site renders all 13 catalog entries from `src/data/projects.ts` using the conservative wording and claim boundaries above; it builds, type-checks, and passes catalog tests. Not yet deployed to GitHub Pages. |
 
 | First-release project | Disposition | Evidence closed | Remaining blocker |
 |---|---|---|---|
