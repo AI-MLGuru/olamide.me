@@ -1,0 +1,209 @@
+---
+import Icon from '~/components/Icon.astro';
+import { contactMethods, profile } from '~/data/profile';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Contact"
+  description={`Get in touch with ${profile.name}, ${profile.title}. Email is the fastest way to reach me.`}
+>
+  <section class="container contact">
+    <div class="contact__head">
+      <p class="eyebrow">Contact</p>
+      <h1>
+        Let’s build something{' '}
+        <span class="serif">
+          <em>worth checking.</em>
+        </span>
+      </h1>
+      <p class="prose">
+        Email is the fastest way to reach me. Tell me what you’re building and where you think I can
+        help, and I’ll reply personally.
+      </p>
+    </div>
+
+    <ul class="methods" role="list">
+      {contactMethods.map((m) => (
+        <li class="method">
+          <a
+            class="method__link"
+            href={m.href}
+            {...(m.id === 'email' || m.id === 'phone'
+              ? {}
+              : { target: '_blank', rel: 'me noopener' })}
+          >
+            <span class="method__icon">
+              <Icon name={m.id} />
+            </span>
+            <span class="method__text">
+              <span class="eyebrow">{m.label}</span>
+              <span class="method__value">{m.value}</span>
+            </span>
+            <Icon name={m.id === 'email' || m.id === 'phone' ? 'arrow-right' : 'arrow-up-right'} />
+          </a>
+          {m.id === 'email' && (
+            <button type="button" class="copy" data-copy={m.value} hidden>
+              <Icon name="copy" />
+              <span data-copy-label>Copy</span>
+            </button>
+          )}
+        </li>
+      ))}
+    </ul>
+  </section>
+</BaseLayout>
+
+<script>
+  for (const button of document.querySelectorAll<HTMLButtonElement>('[data-copy]')) {
+    if (!navigator.clipboard) continue;
+    button.hidden = false;
+    const label = button.querySelector<HTMLElement>('[data-copy-label]')!;
+    button.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(button.dataset['copy']!);
+        label.textContent = 'Copied';
+      } catch {
+        label.textContent = 'Copy failed';
+      }
+      setTimeout(() => (label.textContent = 'Copy'), 2000);
+    });
+  }
+</script>
+
+<style>
+  .contact {
+    display: grid;
+    gap: var(--space-xl);
+    padding-block: var(--space-2xl);
+  }
+
+  @media (min-width: 56rem) {
+    .contact {
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+      gap: var(--space-2xl);
+      align-items: start;
+    }
+  }
+
+  .contact h1 {
+    margin-block: var(--space-s) var(--space-l);
+    font-size: var(--step-4);
+    letter-spacing: -0.04em;
+    line-height: 1.02;
+  }
+
+  .contact h1 .serif {
+    color: var(--accent);
+  }
+
+  .contact .prose {
+    font-size: var(--step-1);
+  }
+
+  .methods {
+    display: grid;
+    gap: var(--space-s);
+    padding: 0;
+    list-style: none;
+  }
+
+  .method {
+    position: relative;
+  }
+
+  .method__link {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: var(--space-m);
+    padding: var(--space-m) var(--space-l) var(--space-m) var(--space-m);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-m);
+    background: var(--bg-raised);
+    text-decoration: none;
+    transition:
+      border-color 200ms var(--ease-out),
+      transform 200ms var(--ease-out);
+  }
+
+  .method__link:hover {
+    color: inherit;
+    border-color: var(--ink);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .method__link:hover {
+      transform: translateX(4px);
+    }
+  }
+
+  .method__link > :global(svg) {
+    width: 1.1rem;
+    height: 1.1rem;
+    color: var(--muted);
+  }
+
+  .method__icon {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    background: var(--bg-sunken);
+  }
+
+  .method__icon :global(svg) {
+    width: 1.15rem;
+    height: 1.15rem;
+  }
+
+  .method__text {
+    display: grid;
+    min-width: 0;
+  }
+
+  .method__value {
+    font-size: var(--step-1);
+    font-weight: 500;
+    overflow-wrap: anywhere;
+  }
+
+  .copy {
+    position: absolute;
+    right: 3.25rem;
+    top: 50%;
+    translate: 0 -50%;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    padding: 0.35em 0.7em;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--bg);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    cursor: pointer;
+  }
+
+  .copy[hidden] {
+    display: none;
+  }
+
+  .copy:hover {
+    border-color: var(--ink);
+  }
+
+  .copy :global(svg) {
+    width: 0.85rem;
+    height: 0.85rem;
+  }
+
+  @media (max-width: 30rem) {
+    .copy {
+      position: static;
+      translate: none;
+      margin-top: var(--space-xs);
+    }
+  }
+</style>
