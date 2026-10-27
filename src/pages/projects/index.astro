@@ -1,0 +1,266 @@
+---
+import Icon from '~/components/Icon.astro';
+import ProjectCard from '~/components/ProjectCard.astro';
+import { projects } from '~/data/projects';
+import { DISCIPLINES, DISCIPLINE_LABELS, STATUS_LABELS, STATUSES } from '~/data/schema';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+
+const filters = DISCIPLINES.map((d) => ({
+  id: d,
+  label: DISCIPLINE_LABELS[d],
+  count: projects.filter((p) => p.disciplines.includes(d)).length,
+})).filter((f) => f.count > 0);
+
+const statusNotes: Record<(typeof STATUSES)[number], string> = {
+  launched: 'Publicly available.',
+  'in-development': 'Actively being built; parts are incomplete.',
+  prototype: 'A working proof of concept, not a finished product.',
+  hackathon: 'Built under time pressure with a team.',
+};
+---
+
+<BaseLayout
+  title="Work"
+  description={`All ${projects.length} projects: AI/ML, agentic systems, backend platforms, and web work, each with its role, evidence, and stated limits.`}
+>
+  <section class="container intro">
+    <p class="eyebrow">Work · {projects.length} projects</p>
+    <h1>
+      Everything I’ve built,{' '}
+      <span class="serif">
+        <em>with receipts.</em>
+      </span>
+    </h1>
+    <p class="prose">
+      Each project lists my role, what’s actually built, how it was checked, and what it doesn’t do
+      yet. Filter by discipline, or open any project for the details.
+    </p>
+  </section>
+
+  <section class="container directory" aria-labelledby="directory-heading">
+    <h2 id="directory-heading" class="visually-hidden">
+      Project directory
+    </h2>
+
+    <div class="filters" role="group" aria-label="Filter by discipline" data-filters hidden>
+      <button type="button" class="filter" aria-pressed="true" data-filter="all">
+        All <span class="filter__count">{projects.length}</span>
+      </button>
+      {filters.map((f) => (
+        <button type="button" class="filter" aria-pressed="false" data-filter={f.id}>
+          {f.label} <span class="filter__count">{f.count}</span>
+        </button>
+      ))}
+    </div>
+    <p class="visually-hidden" aria-live="polite" data-filter-status></p>
+
+    <ul class="grid" role="list">
+      {projects.map((project, i) => (
+        <li data-disciplines={project.disciplines.join(' ')}>
+          <ProjectCard project={project} index={i % 3} />
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="container legend" id="about-the-evidence" aria-labelledby="legend-heading">
+    <div>
+      <p class="eyebrow">Method</p>
+      <h2 id="legend-heading">About the evidence</h2>
+      <p class="prose">
+        Portfolios are easy to inflate. Every claim here is tied to something that was actually
+        checked, and every project page says what isn’t claimed.
+      </p>
+    </div>
+
+    <dl class="legend__list">
+      <div>
+        <dt>
+          <Icon name="flask" /> Tests
+        </dt>
+        <dd>A focused test run was executed and the result recorded, with its scope stated.</dd>
+      </div>
+      <div>
+        <dt>
+          <Icon name="code" /> Source
+        </dt>
+        <dd>The behaviour was confirmed by reading the code or tracing it through Git history.</dd>
+      </div>
+      <div>
+        <dt>
+          <Icon name="globe" /> Live
+        </dt>
+        <dd>The public URL was fetched and responded.</dd>
+      </div>
+    </dl>
+
+    <dl class="legend__list legend__list--status">
+      {STATUSES.map((s) => (
+        <div>
+          <dt>{STATUS_LABELS[s]}</dt>
+          <dd>{statusNotes[s]}</dd>
+        </div>
+      ))}
+    </dl>
+  </section>
+</BaseLayout>
+
+<script>
+  const bar = document.querySelector<HTMLElement>('[data-filters]');
+  const status = document.querySelector<HTMLElement>('[data-filter-status]');
+  const items = [...document.querySelectorAll<HTMLElement>('.grid > li')];
+
+  if (bar && status) {
+    bar.hidden = false;
+    const buttons = [...bar.querySelectorAll<HTMLButtonElement>('[data-filter]')];
+
+    const apply = (filter: string) => {
+      let shown = 0;
+      for (const item of items) {
+        const match = filter === 'all' || item.dataset['disciplines']!.split(' ').includes(filter);
+        item.hidden = !match;
+        if (match) shown++;
+      }
+      for (const button of buttons) {
+        button.setAttribute('aria-pressed', String(button.dataset['filter'] === filter));
+      }
+      status.textContent = `Showing ${shown} project${shown === 1 ? '' : 's'}.`;
+      const url = new URL(location.href);
+      if (filter === 'all') url.searchParams.delete('discipline');
+      else url.searchParams.set('discipline', filter);
+      history.replaceState(null, '', url);
+    };
+
+    bar.addEventListener('click', (event) => {
+      const button = (event.target as Element).closest<HTMLButtonElement>('[data-filter]');
+      if (button) apply(button.dataset['filter']!);
+    });
+
+    const initial = new URL(location.href).searchParams.get('discipline');
+    if (initial && buttons.some((b) => b.dataset['filter'] === initial)) apply(initial);
+  }
+</script>
+
+<style>
+  .intro {
+    padding-block: var(--space-2xl) var(--space-xl);
+  }
+
+  .intro h1 {
+    max-width: 18ch;
+    margin-block: var(--space-s) var(--space-m);
+    font-size: var(--step-4);
+  }
+
+  .intro .serif {
+    color: var(--accent);
+  }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-l);
+  }
+
+  .filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    padding: 0.5em 0.95em;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: transparent;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition:
+      background-color 160ms var(--ease-out),
+      border-color 160ms var(--ease-out),
+      color 160ms var(--ease-out);
+  }
+
+  .filter:hover {
+    border-color: var(--ink);
+  }
+
+  .filter[aria-pressed='true'] {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--bg);
+  }
+
+  .filter__count {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    opacity: 0.65;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+    gap: var(--space-m);
+    padding: 0;
+    list-style: none;
+  }
+
+  .grid > li {
+    display: flex;
+  }
+
+  .grid > li[hidden] {
+    display: none;
+  }
+
+  .grid > li > :global(*) {
+    flex: 1;
+  }
+
+  .legend {
+    display: grid;
+    gap: var(--space-l);
+    margin-top: var(--space-2xl);
+    padding-block: var(--space-xl) var(--space-2xl);
+    border-top: 1px solid var(--line);
+  }
+
+  @media (min-width: 56rem) {
+    .legend {
+      grid-template-columns: 1.2fr 1fr 1fr;
+    }
+  }
+
+  .legend h2 {
+    margin-block: var(--space-xs) var(--space-s);
+    font-size: var(--step-2);
+  }
+
+  .legend__list {
+    display: grid;
+    gap: var(--space-m);
+    align-content: start;
+  }
+
+  .legend__list dt {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--ok);
+  }
+
+  .legend__list--status dt {
+    color: var(--ink);
+  }
+
+  .legend__list dt :global(svg) {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .legend__list dd {
+    margin-top: 0.15rem;
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+</style>
