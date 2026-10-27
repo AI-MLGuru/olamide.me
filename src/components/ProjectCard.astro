@@ -1,0 +1,205 @@
+---
+import { DISCIPLINE_LABELS, type Project } from '~/data/schema';
+import { projectPath } from '~/lib/paths';
+import Icon from './Icon.astro';
+import ProjectGlyph from './ProjectGlyph.astro';
+import StatusBadge from './StatusBadge.astro';
+
+interface Props {
+  project: Project;
+  /** Heading level inside the surrounding page outline. */
+  headingLevel?: 'h2' | 'h3';
+  size?: 'default' | 'large';
+  index?: number;
+}
+
+const { project, headingLevel = 'h3', size = 'default', index } = Astro.props;
+const Heading = headingLevel;
+const lead = project.evidence[0]!;
+const evidenceIcon = lead.kind === 'tests' ? 'flask' : lead.kind === 'live' ? 'globe' : 'code';
+---
+
+<article
+  class:list={['card', 'glyph-host', `card--${size}`]}
+  data-reveal
+  style={index !== undefined ? `--reveal-delay: ${Math.min(index, 6) * 60}ms` : undefined}
+>
+  <div class="card__art">
+    <ProjectGlyph seed={project.slug} />
+  </div>
+
+  <div class="card__body">
+    <div class="card__meta">
+      <StatusBadge status={project.status} />
+      <span class="card__disciplines">
+        {project.disciplines.map((d) => DISCIPLINE_LABELS[d]).join(' · ')}
+      </span>
+    </div>
+
+    <Heading class="card__title">
+      <a href={projectPath(project.slug)} class="card__link">
+        {project.title}
+      </a>
+    </Heading>
+    <p class="card__tagline">{project.tagline}</p>
+
+    <p class="card__evidence">
+      <Icon name={evidenceIcon} />
+      <span>
+        <strong>{lead.label}</strong>
+      </span>
+    </p>
+
+    <span class="card__arrow" aria-hidden="true">
+      <Icon name="arrow-up-right" />
+    </span>
+  </div>
+</article>
+
+<style>
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-l);
+    background: var(--bg-raised);
+    overflow: hidden;
+    transition:
+      border-color 220ms var(--ease-out),
+      transform 220ms var(--ease-out),
+      box-shadow 220ms var(--ease-out);
+  }
+
+  .card:hover,
+  .card:focus-within {
+    border-color: var(--line-strong);
+    box-shadow: var(--shadow);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .card:hover {
+      transform: translateY(-3px);
+    }
+  }
+
+  .card__art {
+    aspect-ratio: 16 / 8;
+    padding: var(--space-m) var(--space-l);
+    border-bottom: 1px solid var(--line);
+    background:
+      radial-gradient(circle at 1px 1px, var(--grid-dot) 1px, transparent 0) 0 0 / 14px 14px,
+      var(--bg-sunken);
+  }
+
+  .card--large .card__art {
+    aspect-ratio: 16 / 7;
+  }
+
+  .card__body {
+    position: relative;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: var(--space-m) var(--space-m) var(--space-l);
+  }
+
+  .card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-xs) var(--space-s);
+    margin-bottom: var(--space-2xs);
+  }
+
+  .card__disciplines {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  .card__title {
+    font-size: var(--step-2);
+    padding-right: 2.5rem;
+  }
+
+  .card__link {
+    text-decoration: none;
+  }
+
+  .card__link:hover {
+    color: inherit;
+  }
+
+  /* Stretch the title link over the whole card. */
+  .card__link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+
+  .card:has(.card__link:focus-visible) {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  .card__link:focus-visible {
+    outline: none;
+  }
+
+  .card__tagline {
+    color: var(--ink-soft);
+  }
+
+  .card__evidence {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    margin-top: auto;
+    padding-top: var(--space-s);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--ok);
+  }
+
+  .card__evidence :global(svg) {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .card__evidence strong {
+    font-weight: 500;
+  }
+
+  .card__arrow {
+    position: absolute;
+    top: var(--space-m);
+    right: var(--space-m);
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    color: var(--muted);
+    transition:
+      background-color 200ms var(--ease-out),
+      color 200ms var(--ease-out),
+      border-color 200ms var(--ease-out),
+      transform 200ms var(--ease-out);
+  }
+
+  .card__arrow :global(svg) {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .card:hover .card__arrow {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+    transform: rotate(45deg);
+  }
+</style>

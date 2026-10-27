@@ -1,0 +1,51 @@
+---
+import { STATUS_LABELS, type Status } from '~/data/schema';
+
+interface Props {
+  status: Status;
+}
+
+const { status } = Astro.props;
+---
+
+<span class="status" data-status={status}>
+  <span class="status__dot" aria-hidden="true"></span>
+  {STATUS_LABELS[status]}
+</span>
+
+<style>
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45em;
+    padding: 0.25em 0.65em;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+
+  .status__dot {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: var(--muted);
+  }
+
+  [data-status='launched'] .status__dot {
+    background: var(--ok);
+    box-shadow: 0 0 0 3px var(--ok-soft);
+  }
+
+  [data-status='in-development'] .status__dot {
+    background: var(--accent);
+  }
+
+  [data-status='hackathon'] .status__dot {
+    background: var(--warn);
+  }
+</style>
