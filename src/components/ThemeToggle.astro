@@ -1,0 +1,84 @@
+---
+import Icon from './Icon.astro';
+---
+
+<button class="theme-toggle" type="button" aria-label="Switch colour theme" data-theme-toggle>
+  <Icon name="sun" class="theme-toggle__sun" />
+  <Icon name="moon" class="theme-toggle__moon" />
+</button>
+
+<script>
+  const root = document.documentElement;
+
+  function currentTheme(): 'light' | 'dark' {
+    const explicit = root.dataset['theme'];
+    if (explicit === 'light' || explicit === 'dark') return explicit;
+    return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+
+  for (const button of document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]')) {
+    const sync = () => {
+      const next = currentTheme() === 'dark' ? 'light' : 'dark';
+      button.setAttribute('aria-label', `Switch to ${next} theme`);
+    };
+    sync();
+    button.addEventListener('click', () => {
+      const next = currentTheme() === 'dark' ? 'light' : 'dark';
+      root.dataset['theme'] = next;
+      try {
+        localStorage.setItem('theme', next);
+      } catch {
+        // Storage can be unavailable (private mode); the toggle still works for this page view.
+      }
+      sync();
+    });
+  }
+</script>
+
+<style>
+  .theme-toggle {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: transparent;
+    cursor: pointer;
+    transition:
+      border-color 160ms var(--ease-out),
+      color 160ms var(--ease-out);
+  }
+
+  .theme-toggle:hover {
+    border-color: var(--ink);
+  }
+
+  .theme-toggle :global(svg) {
+    grid-area: 1 / 1;
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+
+  .theme-toggle__moon {
+    display: none;
+  }
+
+  :global(:root[data-theme='dark']) .theme-toggle__sun {
+    display: none;
+  }
+
+  :global(:root[data-theme='dark']) .theme-toggle__moon {
+    display: block;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .theme-toggle__sun {
+      display: none;
+    }
+
+    :global(:root:not([data-theme='light'])) .theme-toggle__moon {
+      display: block;
+    }
+  }
+</style>

@@ -1,0 +1,113 @@
+---
+import { contactMethods, profile, type ContactMethod } from '~/data/profile';
+import { withBase } from '~/lib/paths';
+import Icon from './Icon.astro';
+
+const social = contactMethods.filter(
+  (m): m is ContactMethod & { id: 'github' | 'linkedin' | 'x' } =>
+    m.id === 'github' || m.id === 'linkedin' || m.id === 'x',
+);
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <div class="site-footer__cta">
+      <p class="eyebrow">Have something worth building?</p>
+      <a class="site-footer__email serif" href={`mailto:${profile.email}`}>
+        {profile.email}
+      </a>
+    </div>
+
+    <div class="site-footer__meta">
+      <ul class="site-footer__social" aria-label="Profiles">
+        {social.map((m) => (
+          <li>
+            <a href={m.href} rel="me noopener" target="_blank">
+              <Icon name={m.id} label={m.label} />
+            </a>
+          </li>
+        ))}
+      </ul>
+      <p class="site-footer__small">
+        © {year} {profile.name} · Built with Astro &amp; TypeScript ·
+        <a href={withBase('/projects/#about-the-evidence')}>How projects are evidenced</a>
+      </p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--line);
+    background: var(--bg-sunken);
+  }
+
+  .site-footer__inner {
+    display: grid;
+    gap: var(--space-l);
+    padding-block: var(--space-xl) var(--space-l);
+  }
+
+  .site-footer__email {
+    display: inline-block;
+    margin-top: var(--space-xs);
+    font-size: var(--step-3);
+    line-height: 1.05;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+    background: linear-gradient(currentColor 0 0) 0 100% / 0 1px no-repeat;
+    transition:
+      background-size 400ms var(--ease-out),
+      color 200ms var(--ease-out);
+  }
+
+  .site-footer__email:hover {
+    background-size: 100% 1px;
+  }
+
+  .site-footer__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-m);
+    padding-top: var(--space-m);
+    border-top: 1px solid var(--line);
+  }
+
+  .site-footer__social {
+    display: flex;
+    gap: var(--space-xs);
+    padding: 0;
+    list-style: none;
+  }
+
+  .site-footer__social a {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    color: var(--ink-soft);
+    transition:
+      color 160ms var(--ease-out),
+      border-color 160ms var(--ease-out);
+  }
+
+  .site-footer__social a:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .site-footer__social :global(svg) {
+    width: 1.05rem;
+    height: 1.05rem;
+  }
+
+  .site-footer__small {
+    color: var(--muted);
+    font-size: var(--step--1);
+  }
+</style>

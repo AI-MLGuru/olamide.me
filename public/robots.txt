@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ai-mlguru.github.io/portfolio.me/sitemap-index.xml
