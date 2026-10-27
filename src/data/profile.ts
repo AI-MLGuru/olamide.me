@@ -19,9 +19,8 @@ export const profile = {
   /** E.164 for the tel: link, plus a readable form. */
   phone: { e164: '+2349132585172', display: '+234 913 258 5172' },
   github: 'https://github.com/AI-MLGuru',
-  /** Add the full profile URLs to show them on the site. */
-  linkedin: undefined as string | undefined,
-  x: undefined as string | undefined,
+  linkedin: 'https://www.linkedin.com/in/olamide-fadahunsi-05044a385',
+  x: 'https://x.com/OlamideFad46736',
   /** Optional hosted résumé; hidden when undefined. */
   resume: undefined as string | undefined,
 } as const;
