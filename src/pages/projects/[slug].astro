@@ -1,0 +1,456 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Icon, { type IconName } from '~/components/Icon.astro';
+import ProjectGlyph from '~/components/ProjectGlyph.astro';
+import StatusBadge from '~/components/StatusBadge.astro';
+import { projects } from '~/data/projects';
+import { DISCIPLINE_LABELS, LINK_LABELS, type EvidenceKind, type Project } from '~/data/schema';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import { projectPath, withBase } from '~/lib/paths';
+
+export const getStaticPaths = (() =>
+  projects.map((project, i) => ({
+    params: { slug: project.slug },
+    props: {
+      project,
+      previous: projects[(i - 1 + projects.length) % projects.length]!,
+      next: projects[(i + 1) % projects.length]!,
+    },
+  }))) satisfies GetStaticPaths;
+
+interface Props {
+  project: Project;
+  previous: Project;
+  next: Project;
+}
+
+const { project, previous, next } = Astro.props;
+
+const evidenceMeta: Record<EvidenceKind, { icon: IconName; label: string }> = {
+  tests: { icon: 'flask', label: 'Test run' },
+  source: { icon: 'code', label: 'Source review' },
+  live: { icon: 'globe', label: 'Live check' },
+};
+
+const linkIcon = (kind: Project['links'][number]['kind']): IconName =>
+  kind === 'site' ? 'arrow-up-right' : 'github';
+---
+
+<BaseLayout title={project.title} description={`${project.tagline}. ${project.summary}`}>
+  <article class="project glyph-host">
+    <header class="container project__header">
+      <a class="back" href={withBase('/projects/')}>
+        <Icon name="arrow-left" /> All work
+      </a>
+
+      <div class="project__meta">
+        <StatusBadge status={project.status} />
+        {project.context && <span class="project__context">{project.context}</span>}
+      </div>
+
+      <h1>{project.title}</h1>
+      <p class="project__tagline serif">{project.tagline}</p>
+
+      {project.links.length > 0 && (
+        <ul class="project__links" role="list">
+          {project.links.map((link, i) => (
+            <li>
+              <a
+                class:list={['button', { 'button--primary': i === 0 }]}
+                href={link.href}
+                target="_blank"
+                rel="noopener"
+              >
+                <Icon name={linkIcon(link.kind)} />
+                {LINK_LABELS[link.kind]}
+                <span class="visually-hidden">(opens in a new tab)</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+    </header>
+
+    <div class="container">
+      <div class="project__art">
+        <ProjectGlyph seed={project.slug} />
+      </div>
+    </div>
+
+    <div class="container project__layout">
+      <div class="project__main">
+        <section aria-labelledby="overview">
+          <h2 id="overview" class="eyebrow">
+            Overview
+          </h2>
+          <p class="project__summary">{project.summary}</p>
+        </section>
+
+        <section aria-labelledby="role">
+          <h2 id="role" class="eyebrow">
+            My role
+          </h2>
+          <p class="project__role">{project.role}</p>
+        </section>
+
+        <section aria-labelledby="built">
+          <h2 id="built" class="eyebrow">
+            What’s built
+          </h2>
+          <ul class="checklist" role="list">
+            {project.highlights.map((item) => (
+              <li>
+                <Icon name="check" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        {project.boundaries.length > 0 && (
+          <section aria-labelledby="not-claimed" class="boundaries">
+            <h2 id="not-claimed" class="eyebrow">
+              Not claimed
+            </h2>
+            <ul class="checklist checklist--muted" role="list">
+              {project.boundaries.map((item) => (
+                <li>
+                  <Icon name="minus" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+      </div>
+
+      <aside class="project__aside" aria-label="Evidence and stack">
+        <section aria-labelledby="evidence">
+          <h2 id="evidence" class="eyebrow">
+            Evidence
+          </h2>
+          <ul class="evidence" role="list">
+            {project.evidence.map((item) => (
+              <li class="evidence__item">
+                <p class="evidence__kind">
+                  <Icon name={evidenceMeta[item.kind].icon} />
+                  {evidenceMeta[item.kind].label}
+                </p>
+                <p class="evidence__label">{item.label}</p>
+                <p class="evidence__detail">{item.detail}</p>
+              </li>
+            ))}
+          </ul>
+          <a class="evidence__method" href={withBase('/projects/#about-the-evidence')}>
+            How evidence is recorded
+          </a>
+        </section>
+
+        <section aria-labelledby="stack">
+          <h2 id="stack" class="eyebrow">
+            Stack
+          </h2>
+          <ul class="chips" role="list">
+            {project.stack.map((tech) => (
+              <li>{tech}</li>
+            ))}
+          </ul>
+        </section>
+
+        <section aria-labelledby="disciplines">
+          <h2 id="disciplines" class="eyebrow">
+            Disciplines
+          </h2>
+          <ul class="chips" role="list">
+            {project.disciplines.map((d) => (
+              <li>
+                <a href={withBase(`/projects/?discipline=${d}`)}>{DISCIPLINE_LABELS[d]}</a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      </aside>
+    </div>
+
+    <nav class="container pager" aria-label="More projects">
+      <a href={projectPath(previous.slug)} class="pager__link">
+        <span class="eyebrow">
+          <Icon name="arrow-left" /> Previous
+        </span>
+        <span class="pager__title">{previous.title}</span>
+      </a>
+      <a href={projectPath(next.slug)} class="pager__link pager__link--next">
+        <span class="eyebrow">
+          Next <Icon name="arrow-right" />
+        </span>
+        <span class="pager__title">{next.title}</span>
+      </a>
+    </nav>
+  </article>
+</BaseLayout>
+
+<style>
+  .project__header {
+    padding-block: var(--space-xl) var(--space-l);
+  }
+
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    margin-bottom: var(--space-l);
+    color: var(--muted);
+    font-size: 0.9rem;
+    text-decoration: none;
+  }
+
+  .back :global(svg) {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .project__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-s);
+  }
+
+  .project__context {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+
+  h1 {
+    margin-top: var(--space-m);
+    font-size: var(--step-4);
+    letter-spacing: -0.035em;
+  }
+
+  .project__tagline {
+    max-width: 30ch;
+    margin-top: var(--space-xs);
+    font-size: var(--step-2);
+    line-height: 1.2;
+    color: var(--ink-soft);
+  }
+
+  .project__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    margin-top: var(--space-l);
+    padding: 0;
+    list-style: none;
+  }
+
+  .project__art {
+    aspect-ratio: 16 / 6;
+    padding: clamp(1rem, 4vw, 3rem) clamp(1rem, 8vw, 6rem);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-l);
+    background:
+      radial-gradient(circle at 1px 1px, var(--grid-dot) 1px, transparent 0) 0 0 / 16px 16px,
+      var(--bg-sunken);
+  }
+
+  @media (max-width: 40rem) {
+    .project__art {
+      aspect-ratio: 16 / 9;
+    }
+  }
+
+  .project__layout {
+    display: grid;
+    gap: var(--space-xl);
+    padding-block: var(--space-xl) var(--space-2xl);
+  }
+
+  @media (min-width: 56rem) {
+    .project__layout {
+      grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+      gap: var(--space-2xl);
+    }
+
+    .project__aside {
+      position: sticky;
+      top: 6rem;
+      align-self: start;
+    }
+  }
+
+  .project__main,
+  .project__aside {
+    display: grid;
+    gap: var(--space-xl);
+    align-content: start;
+  }
+
+  .project__main h2,
+  .project__aside h2 {
+    margin-bottom: var(--space-s);
+  }
+
+  .project__summary {
+    font-size: var(--step-1);
+    line-height: 1.5;
+  }
+
+  .project__role {
+    font-size: var(--step-1);
+    line-height: 1.5;
+    color: var(--ink-soft);
+    padding-left: var(--space-m);
+    border-left: 2px solid var(--accent);
+  }
+
+  .checklist {
+    display: grid;
+    gap: var(--space-s);
+    padding: 0;
+    list-style: none;
+  }
+
+  .checklist li {
+    display: grid;
+    grid-template-columns: 1.25rem 1fr;
+    gap: var(--space-s);
+    color: var(--ink-soft);
+  }
+
+  .checklist :global(svg) {
+    width: 1.1rem;
+    height: 1.1rem;
+    margin-top: 0.25em;
+    color: var(--ok);
+  }
+
+  .checklist--muted :global(svg) {
+    color: var(--muted);
+  }
+
+  .boundaries {
+    padding: var(--space-m);
+    border: 1px dashed var(--line-strong);
+    border-radius: var(--radius-m);
+  }
+
+  .evidence {
+    display: grid;
+    gap: var(--space-s);
+    padding: 0;
+    list-style: none;
+  }
+
+  .evidence__item {
+    padding: var(--space-m);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-m);
+    background: var(--bg-raised);
+  }
+
+  .evidence__kind {
+    display: flex;
+    align-items: center;
+    gap: 0.45em;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .evidence__kind :global(svg) {
+    width: 0.95rem;
+    height: 0.95rem;
+  }
+
+  .evidence__label {
+    margin-top: var(--space-2xs);
+    font-family: var(--font-mono);
+    font-size: var(--step-1);
+    font-weight: 500;
+    color: var(--ok);
+  }
+
+  .evidence__detail {
+    margin-top: var(--space-2xs);
+    font-size: 0.92rem;
+    color: var(--ink-soft);
+  }
+
+  .evidence__method {
+    display: inline-block;
+    margin-top: var(--space-s);
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    padding: 0;
+    list-style: none;
+  }
+
+  .chips li {
+    padding: 0.3em 0.75em;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+  }
+
+  .chips a {
+    text-decoration: none;
+  }
+
+  .pager {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-m);
+    padding-bottom: var(--space-2xl);
+  }
+
+  .pager__link {
+    display: grid;
+    gap: var(--space-xs);
+    padding: var(--space-m) var(--space-l);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-l);
+    text-decoration: none;
+    transition: border-color 200ms var(--ease-out);
+  }
+
+  .pager__link:hover {
+    color: inherit;
+    border-color: var(--ink);
+  }
+
+  .pager__link--next {
+    text-align: right;
+  }
+
+  .pager .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+  }
+
+  .pager__link--next .eyebrow {
+    justify-content: flex-end;
+  }
+
+  .pager .eyebrow :global(svg) {
+    width: 0.9rem;
+    height: 0.9rem;
+  }
+
+  .pager__title {
+    font-size: var(--step-1);
+    font-weight: 600;
+  }
+</style>
