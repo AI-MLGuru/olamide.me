@@ -1,0 +1,360 @@
+---
+import { Picture } from 'astro:assets';
+import portrait from '~/assets/portrait.jpg';
+import Icon from '~/components/Icon.astro';
+import { profile } from '~/data/profile';
+import { projects } from '~/data/projects';
+import { DISCIPLINE_LABELS, DISCIPLINES } from '~/data/schema';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import { projectPath, withBase } from '~/lib/paths';
+
+// Toolkit is derived from the catalog so it only lists technologies that appear in real projects.
+const stackUsage = new Map<string, string[]>();
+for (const project of projects) {
+  for (const tech of project.stack) {
+    stackUsage.set(tech, [...(stackUsage.get(tech) ?? []), project.title]);
+  }
+}
+const toolkit = [...stackUsage.entries()]
+  .map(([tech, used]) => ({ tech, used }))
+  .sort((a, b) => b.used.length - a.used.length || a.tech.localeCompare(b.tech));
+const maxUse = toolkit[0]?.used.length ?? 1;
+
+const disciplineCounts = DISCIPLINES.map((d) => ({
+  id: d,
+  label: DISCIPLINE_LABELS[d],
+  count: projects.filter((p) => p.disciplines.includes(d)).length,
+}));
+
+const collaborations = projects
+  .filter((p) => p.context)
+  .map((p) => ({ context: p.context!, title: p.title, slug: p.slug }));
+---
+
+<BaseLayout
+  title="About"
+  description={`About ${profile.name}: an ${profile.title} in ${profile.location} working across data, ML, backend systems, and agentic software.`}
+  type="profile"
+>
+  <section class="container about">
+    <div class="about__intro">
+      <p class="eyebrow">About</p>
+      <h1>
+        I work on the parts of a product that{' '}
+        <span class="serif">
+          <em>have to be right.</em>
+        </span>
+      </h1>
+      <div class="prose about__bio">
+        <p>
+          I’m {profile.name}, an AI/ML and backend engineer based in {profile.location}. Most of my
+          work sits where data, algorithms, and backend systems meet. I train and monitor ML models,
+          build ranking and matching, ground AI assistants in real records, and build the
+          multi-tenant APIs those features run on.
+        </p>
+        <p>
+          I’ve built on hackathon teams, in a mentorship programme, for a startup I co-founded, and
+          on products of my own. Across all of them, what interests me most is how a system behaves
+          when something goes wrong: a model asked about money it shouldn’t guess at, an agent
+          missing the context it needs, a tenant trying to read another tenant’s data.
+        </p>
+        <p>
+          That’s why this portfolio is built the way it is. Every project says what I did, how it
+          was checked, and what isn’t finished yet.
+        </p>
+      </div>
+      <div class="about__actions">
+        <a class="button button--primary" href={withBase('/contact/')}>
+          Get in touch <Icon name="arrow-right" />
+        </a>
+        <a class="button" href={profile.github} target="_blank" rel="me noopener">
+          <Icon name="github" /> GitHub
+        </a>
+        {profile.resume && (
+          <a class="button" href={profile.resume} target="_blank" rel="noopener">
+            Résumé
+          </a>
+        )}
+      </div>
+    </div>
+
+    <figure class="about__portrait">
+      <Picture
+        src={portrait}
+        alt={`Portrait of ${profile.name}`}
+        widths={[320, 480, 640]}
+        sizes="(min-width: 56rem) 22rem, 80vw"
+        formats={['avif', 'webp']}
+      />
+      <figcaption class="mono">
+        <Icon name="map-pin" />
+        {profile.location}
+      </figcaption>
+    </figure>
+  </section>
+
+  <section class="section container" aria-labelledby="focus-heading">
+    <div class="split">
+      <header>
+        <p class="eyebrow">Focus</p>
+        <h2 id="focus-heading">Where the work lands</h2>
+        <p class="muted">Projects per discipline. Most projects span more than one.</p>
+      </header>
+      <ul class="disciplines" role="list">
+        {disciplineCounts.map((d) => (
+          <li>
+            <a href={withBase(`/projects/?discipline=${d.id}`)}>
+              <span class="disciplines__count mono">{String(d.count).padStart(2, '0')}</span>
+              <span>{d.label}</span>
+              <Icon name="arrow-right" />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section container" aria-labelledby="toolkit-heading">
+    <div class="split">
+      <header>
+        <p class="eyebrow">Toolkit</p>
+        <h2 id="toolkit-heading">Tools, by how often I’ve shipped with them</h2>
+        <p class="muted">Counted from the project catalog, not a wish list.</p>
+      </header>
+      <ul class="toolkit" role="list">
+        {toolkit.map((t) => (
+          <li title={t.used.join(', ')}>
+            <span class="toolkit__name">{t.tech}</span>
+            <span class="toolkit__bar" aria-hidden="true">
+              <span style={`--w: ${(t.used.length / maxUse) * 100}%`} />
+            </span>
+            <span class="toolkit__count mono">
+              {t.used.length}
+              <span class="visually-hidden"> project{t.used.length === 1 ? '' : 's'}</span>
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section container" aria-labelledby="teams-heading">
+    <div class="split">
+      <header>
+        <p class="eyebrow">Teams</p>
+        <h2 id="teams-heading">Built with other people</h2>
+        <p class="muted">Credit where it’s shared. My role is stated on each project page.</p>
+      </header>
+      <ul class="teams" role="list">
+        {collaborations.map((c) => (
+          <li>
+            <a href={projectPath(c.slug)}>
+              <span class="teams__title">{c.title}</span>
+              <span class="teams__context">{c.context}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .about {
+    display: grid;
+    gap: var(--space-xl);
+    padding-block: var(--space-2xl);
+  }
+
+  @media (min-width: 56rem) {
+    .about {
+      grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+      gap: var(--space-2xl);
+      align-items: start;
+    }
+  }
+
+  .about h1 {
+    margin-block: var(--space-s) var(--space-l);
+    font-size: var(--step-4);
+    letter-spacing: -0.04em;
+    line-height: 1.02;
+  }
+
+  .about h1 .serif {
+    color: var(--accent);
+  }
+
+  .about__bio {
+    font-size: var(--step-1);
+    line-height: 1.6;
+  }
+
+  .about__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-s);
+    margin-top: var(--space-l);
+  }
+
+  .about__portrait {
+    max-width: 24rem;
+    width: 100%;
+    justify-self: center;
+  }
+
+  @media (min-width: 56rem) {
+    .about__portrait {
+      position: sticky;
+      top: 6rem;
+    }
+  }
+
+  .about__portrait :global(img) {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    object-position: 50% 30%;
+    border-radius: var(--radius-l);
+    border: 1px solid var(--line);
+  }
+
+  .about__portrait figcaption {
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+    margin-top: var(--space-s);
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  .about__portrait figcaption :global(svg) {
+    width: 0.95rem;
+    height: 0.95rem;
+  }
+
+  .split {
+    display: grid;
+    gap: var(--space-l);
+  }
+
+  @media (min-width: 56rem) {
+    .split {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
+      gap: var(--space-2xl);
+    }
+  }
+
+  .split h2 {
+    margin-block: var(--space-xs) var(--space-s);
+    font-size: var(--step-2);
+  }
+
+  .muted {
+    color: var(--muted);
+  }
+
+  .disciplines,
+  .teams,
+  .toolkit {
+    padding: 0;
+    list-style: none;
+  }
+
+  .disciplines li,
+  .teams li {
+    border-top: 1px solid var(--line);
+  }
+
+  .disciplines li:last-child,
+  .teams li:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .disciplines a {
+    display: grid;
+    grid-template-columns: 3rem 1fr auto;
+    align-items: center;
+    padding-block: var(--space-m);
+    font-size: var(--step-1);
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .disciplines__count {
+    font-size: 0.85rem;
+    color: var(--accent);
+  }
+
+  .disciplines :global(svg) {
+    width: 1.1rem;
+    height: 1.1rem;
+    color: var(--muted);
+    transition: transform 200ms var(--ease-out);
+  }
+
+  .disciplines a:hover :global(svg) {
+    transform: translateX(4px);
+    color: var(--accent);
+  }
+
+  .toolkit {
+    display: grid;
+    gap: var(--space-s);
+  }
+
+  .toolkit li {
+    display: grid;
+    grid-template-columns: minmax(7rem, 10rem) 1fr 2rem;
+    align-items: center;
+    gap: var(--space-m);
+  }
+
+  .toolkit__name {
+    font-weight: 500;
+  }
+
+  .toolkit__bar {
+    height: 6px;
+    border-radius: 999px;
+    background: var(--bg-sunken);
+    overflow: hidden;
+  }
+
+  .toolkit__bar span {
+    display: block;
+    width: var(--w);
+    height: 100%;
+    border-radius: inherit;
+    background: var(--ink);
+  }
+
+  .toolkit li:first-child .toolkit__bar span {
+    background: var(--accent);
+  }
+
+  .toolkit__count {
+    text-align: right;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .teams a {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-2xs) var(--space-m);
+    padding-block: var(--space-m);
+    text-decoration: none;
+  }
+
+  .teams__title {
+    font-size: var(--step-1);
+    font-weight: 500;
+  }
+
+  .teams__context {
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+</style>
