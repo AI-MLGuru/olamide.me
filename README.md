@@ -2,13 +2,13 @@
 
 Source for the portfolio of Olamide Fadahunsi (AI/ML & backend engineer).
 
-Static site built with Astro and TypeScript, deployed to GitHub Pages by `.github/workflows/deploy.yml`. For the root domain site, the production base path is `/` and the site URL is `https://olamide.github.io`.
+Static site built with Astro and TypeScript, deployed to GitHub Pages by `.github/workflows/deploy.yml`. The build derives the site URL and base path from `GITHUB_REPOSITORY`; the `AI-MLGuru/olamide.me` repository publishes at `https://ai-mlguru.github.io/olamide.me/`.
 
 ## Develop
 
 ```sh
 npm install
-npm run dev        # http://localhost:4321/portfolio.me/
+npm run dev        # http://localhost:4321/olamide.me/
 npm test           # catalog + glyph unit tests
 npm run build      # astro check, then a static build into dist/
 npm run preview    # serve the production build

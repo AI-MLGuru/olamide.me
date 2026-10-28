@@ -11,7 +11,7 @@ This is a plan, not a claim that the projects or their published results have al
 - The repository contains a single `index.html`, `profile.jpg`, and IDE metadata; it has no `package.json`, TypeScript setup, component system, test suite, or build pipeline.
 - The current page already supplies a simple content outline (intro, about, projects, skills, contact) and a profile image that may be reusable after approval.
 - The page includes personal details and a bio that may no longer be current. Reconfirm all public-facing copy and contact details; do not carry over the age statement or phone number without explicit approval.
-- GitHub Pages serves the deployed project under its repository-name path. Derive Astro's production `base` from `GITHUB_REPOSITORY` so asset and route URLs match the actual deployed repository; keep `/portfolio.me/` as the local fallback.
+- GitHub Pages serves the deployed project under its repository-name path. Derive Astro's production `site` and `base` from `GITHUB_REPOSITORY` so asset and route URLs match the actual deployed repository; default local development to the planned `AI-MLGuru/olamide.me` URL (`https://ai-mlguru.github.io/olamide.me/`).
 - There is no application architecture or framework to preserve. Keep the existing Git history and selectively reuse approved content and assets.
 
 ## Audience and positioning
