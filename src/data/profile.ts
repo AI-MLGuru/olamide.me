@@ -45,5 +45,10 @@ export const contactMethods: ContactMethod[] = [
   ...(profile.x
     ? [{ id: 'x', label: 'X', value: `@${handleFromUrl(profile.x)}`, href: profile.x } as const]
     : []),
-  { id: 'phone', label: 'Phone', value: profile.phone.display, href: `tel:${profile.phone.e164}` },
+  {
+    id: 'phone',
+    label: 'Phone / WhatsApp contact',
+    value: profile.phone.display,
+    href: `tel:${profile.phone.e164}`,
+  },
 ];
