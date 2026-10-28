@@ -2,13 +2,12 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
-const repository = process.env.GITHUB_REPOSITORY?.split('/')[1];
-const base = repository && !repository.endsWith('.github.io') ? `/${repository}` : '/portfolio.me';
+const base = '/';
 
-// Served from GitHub Pages as a project site, so every route and asset
-// lives under the repository path. Build links with `withBase()` from src/lib/paths.ts.
+// The site is published at the root GitHub Pages domain for this account.
+// Keep the base at '/' and use `withBase()` from src/lib/paths.ts for stable internal links.
 export default defineConfig({
-  site: 'https://ai-mlguru.github.io',
+  site: 'https://olamide.github.io',
   base,
   trailingSlash: 'always',
   integrations: [sitemap()],

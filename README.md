@@ -2,7 +2,7 @@
 
 Source for the portfolio of Olamide Fadahunsi (AI/ML & backend engineer).
 
-Static site built with Astro and TypeScript, deployed to GitHub Pages by `.github/workflows/deploy.yml`. GitHub Actions derives the project base path from the repository name, so production assets and internal links match the deployed repository URL.
+Static site built with Astro and TypeScript, deployed to GitHub Pages by `.github/workflows/deploy.yml`. For the root domain site, the production base path is `/` and the site URL is `https://olamide.github.io`.
 
 ## Develop
 
